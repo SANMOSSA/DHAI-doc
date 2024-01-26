@@ -1,7 +1,6 @@
 
 - [Documentación de la API DoctorHelper.](#documentación-de-la-api-doctorhelper)
     - [Autenticación de todos los llamados.](#autenticación-de-todos-los-llamados)
-    - [Actualizaciones](#actualizaciones)
     - [Comportamiento.](#comportamiento)
         - [(POST) UserValidation.](#post-uservalidation)
         - [(POST) Appointments.](#post-appointments)
@@ -29,6 +28,7 @@
         - [(POST) ActivatePatient](#post-activatepatient)
         - [(POST) GetPractitionerPhoto.](#post-getpractitionerphoto)
         - [(POST) UpdatePractitionerPhoto.](#post-updatepractitionerphoto)
+        - [(POST) WakeUpWord (Nuevo).](#post-wakeupword-nuevo)
   - [Errores extra](#errores-extra)
     - [Error de token](#error-de-token)
     - [Error de Action](#error-de-action)
@@ -38,20 +38,24 @@
 
 La API del backend para DoctorHelperAI posee un endpoint para el procesamiento de todas las consultas
 
-**Endpoint de producción** : [**https://doctorhelperaibackend.azurewebsites.net**](https://doctorhelperaibackend.azurewebsites.net/)
+**Endpoint de producción** : [**https://doctorhelperaibackend.<img src="https://doctorhelperaibackend.azurewebsites.net/)
 
-**Endpoint de pruebas:** [**https://doctorhelperaibackend-qa.azurewebsites.net**](https://doctorhelperaibackend-dev.azurewebsites.net/)
+**Endpoint de pruebas:** [**https://doctorhelperaibackend-qa.<img src="https://doctorhelperaibackend-dev.azurewebsites.net/)
 
 **A la fecha actual (25/01/2024) se debe usar la Url de pruebas**
 
 ### Autenticación de todos los llamados.
 
 La API utiliza autenticación mediante un token. En la primera solicitud se respondera el token de acceso, este se debe enviar por medio de un header llamado "Token" en las demás solicitudes
-### Actualizaciones
-(14/12/2023) Se realizaron cambios en los llamados PlaningReturn y Approved, 
-por lo que se recomienda revisar la salida de los 2 llamados
-### Comportamiento.
 
+### Comportamiento.
+>[!NOTE] Actualizaciones del 25 de enero de 2024
+>1. Se corrigieron los errores de documentacion en:
+>       - [(POST) DataFrondEnd](#post-datafrondend)
+>       - [(POST) AudioEncounter.](#post-audioencounter)
+>1. Se añado el llamado 
+>       - [(POST) WakeUpWord.](#post-wakeupword)
+> 
 El comportamiento de cada consulta estará dado por un header llamado "Action", este header posee los siguientes valores:
 
 - (POST) UserValidation
@@ -82,6 +86,7 @@ El comportamiento de cada consulta estará dado por un header llamado "Action", 
 - (POST) UpdatePractitionerPhoto
 - (POST) GetPractitionerPhoto
 - (POST) UpdatePractitionerPhoto
+- (POST) WakeUpWord
 
 A continuación, se mostrarán ejemplos de cómo se debe realizar cada una de las consultas en Python junto a un ejemplo de retorno de cada una de estas.
 
@@ -153,8 +158,8 @@ return Response.json()
 
 La salida de esta consulta puede ser:
 
-- Respuesta valida del servidor [#Link](https://doctorhelperaibackend-qa.azurewebsites.net/Archivo?Url=JSON-Appointments.txt)
-- Respuesta valida del servidor, pero sin citas [#Link](https://doctorhelperaibackend-qa.azurewebsites.net/Archivo?Url=JSON-Appointments%20Vacio.txt)
+- Respuesta valida del servidor <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/JSON-Appointments.txt)
+- Respuesta valida del servidor, pero sin citas <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/JSON-Appointments%20Vacio.txt)
 - Respuesta no valida
     ```python
     {'Error en Appointments': TypeError}
@@ -253,7 +258,7 @@ return Response.json()
 
 La salida de esta consulta puede ser:
 
-- Respuesta valida del servidor [#Link](https://doctorhelperaibackend-qa.azurewebsites.net/Archivo?Url=JSON-JSONReturnSummary.txt)
+- Respuesta valida del servidor <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/JSON-JSONReturnSummary.txt)
 
 - Respuesta no valida del servidor
     ```python
@@ -286,7 +291,7 @@ Response = requests.post(Url, headers=Headers)
 PhotoData = Response.json()
 FilenName = PhotoData['FileName']
 PhotoData64 = PhotoData['File']
-Decodifica el binario desde base64
+# Decodifica el binario desde base64
 PhotoData64 = base64.b64decode(PhotoData64)
 
 withopen(FilenName, 'wb') as PhotoFile:
@@ -294,13 +299,12 @@ withopen(FilenName, 'wb') as PhotoFile:
 ```
 La respuesta puede ser.
 
-- Respuesta valida del servidor [#Link](https://doctorhelperaibackend-qa.azurewebsites.net/Archivo?Url=JSON-AudioSummary.txt)
+- Respuesta valida del servidor <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/JSON-AudioSummary.txt)
 
 - Respuesta no valida por un error inesperado
     ```python
     {'Error en AudioSummary': TypeError}
     ```
-
 ##### (POST) Subjective/Objective/Assessment.
 
 En este llamado el cliente le envia a la API archivos de audio en formato m4a. Cada archivo de audio debe tener un nombre específico que sigue la estructura "PatientId-{Action}.m4a". Aquí, {Action} es un valor que corresponde a la acción específica, por ejemplo, "Subjective", además el valor de'DHAIRecord{Action}' también cumple esta regla . En el siguiente ejemplo, se muestra cómo realizar una consulta para la parte "Subjective", los headers para el llamado son los siguientes:
@@ -334,7 +338,6 @@ La respuesta puede ser.
 #Respuesta no valida por error desconocido
 {'Error en Planning': TypeError}
 ```
-
 ##### (POST) PlaningReturn.
 
 
@@ -370,7 +373,6 @@ La respuesta puede ser.
 #Respuesta no valida del servidor
 {"Error":TypeError,"Status": "Flase"}
 ```
-
 ##### (POST) AudioEncounter.
 
 En esta consulta el cliente le solicita a la API un resumen en forma de audio sobre la cita medica del paciente, el audio se envía en formato m4a, con el nombre del paciente en el header "FileName", la estructura para el nombre del archivo es PatientId\_Encounter.m4a, los headers para el llamado son los siguientes:
@@ -384,6 +386,7 @@ En esta consulta el cliente le solicita a la API un resumen en forma de audio so
 Ejemplo:
 ```python
 import requests
+import base64
 
 Url ="https://doctorhelperaibackend-qa.azurewebsites.net"
 
@@ -394,11 +397,14 @@ Headers =   {
             }
 
 Response = requests.post(Url, headers=Headers)
-AudioData = Response.content
-FilenName = Response.headers.get("FileName")
+PhotoData = Response.json()
+FilenName = PhotoData['FileName']
+PhotoData64 = PhotoData['File']
+# Decodifica el binario desde base64
+PhotoData64 = base64.b64decode(PhotoData64)
 
-withopen(FilenName, 'wb') as AudioFile:
-    AudioFile.write(AudioData)
+withopen(FilenName, 'wb') as PhotoFile:
+     PhotoFile.write(PhotoData64)
 ```
 La respuesta puede ser.
 - Archivo de audio en formato m4a: 1234567890-Summary.m4a.
@@ -407,7 +413,6 @@ La respuesta puede ser.
     ```python
     {'Error en AudioEncounter': TypeError}
     ```
-
 ##### (POST) Correction.
 
 En este llamado el cliente le envia a la API un archivo de audio en formato m4a. el nombre del archivo sigue la estructura "PatientId-Correction.m4a". Aquí se retornará el tiempo aproximado para la creación del bundle corregido, los headers para el llamado son los siguientes:
@@ -441,7 +446,6 @@ La respuesta puede ser.
 #Respuesta no valida por error desconocido
 {'Error en Correction ': TypeError}
 ```
-
 ##### (POST) CorrectionReturn.
 
 
@@ -471,13 +475,12 @@ return Response.json()
 
 La respuesta puede ser.
 
-- Respuesta valida del servidor [#Link](https://doctorhelperaibackend-qa.azurewebsites.net/Archivo?Url=JSON-Planning-Correction%20.txt)
+- Respuesta valida del servidor <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/JSON-Planning-Correction%20.txt)
 
 - Respuesta no valida del servidor
     ```python
     {"Correction":str(e)}
     ```
-
 ##### (POST) Approved.
 
 En esta consulta la API guardara toda la información en la base de datos, los headers para el llamado son los siguientes:
@@ -517,7 +520,6 @@ La respuesta puede ser.
 #Respuesta no valida por un error inesperado
 {'Status':'Error','Error': str(e)}
 ```
-
 ##### (POST) GetPatients.
 
 En este llamado el cliente le pide a la API que le retorne todos los pacientes de un medico, los headers para el llamado son los siguientes:
@@ -547,13 +549,12 @@ return Response.json()
 
 La respuesta puede ser.
 
-- Respuesta valida del servidor [#Link](https://doctorhelperaibackend-qa.azurewebsites.net/Archivo?Url=JSON-GetPatients.txt)
+- Respuesta valida del servidor <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/JSON-GetPatients.txt)
 
 - Respuesta no valida del servidor
     ```python
     {'Error en GetPatients': TypeError}
     ```
-
 ##### (POST) PostPatient.
 
 En este llamado el cliente le pide a la API que cree un nuevo paciente, los headers para el llamado son los siguientes:
@@ -618,7 +619,6 @@ La respuesta puede ser.
 #Respuesta no valida por un error inesperado
 {'Error en PostPatients': TypeError}
 ```
-
 ##### (POST) PostAppointment.
 
 En este llamado el cliente le pide a la API que cree un nuevo appointment, los headers para el llamado son los siguientes:
@@ -674,7 +674,6 @@ La respuesta puede ser.
 #Respuesta no valida por un error inesperado
 {'Error en PostAppointment': TypeError}
 ```
-
 ##### (POST) Delete
 
 En este llamado el cliente le pide a la API que elimine todos los recursos de FHIR que correspondan al tipo de recurso enviado en el header "Resource", la estructura de los header es de la siguiente manera:
@@ -719,7 +718,6 @@ La respuesta puede ser.
 #Respuesta no valida por un error inesperado
 {"Status":"False","Error":"Tipo de recurso no encontrado: Resource"}
 ```
-
 ##### (POST) DataFrondEnd
 
 En este llamado el cliente le pide a la API que envie el archivo comprimido del paciente solicitado, la estructura de los header es de la siguiente manera:
@@ -759,8 +757,8 @@ try:
     ZipData64 = ZipData['File']
     # Decodifica el binario desde base64
     ZipData64 = base64.b64decode(ZipData64)
-    withopen(FilenName, 'wb') as PhotoFile:
-        PhotoFile.write(ZipData64)
+    withopen(FilenName, 'wb') as DataFile:
+        DataFile.write(ZipData64)
 
 except Exceptionas e:
     print(e)
@@ -774,8 +772,6 @@ print("Data descomprimida")
 ```
 
 La respuesta es el archivo solicitado
-
-
 ##### (POST) DeleteUser
 
 En este llamado el cliente le pide a la API que elimine del servidor todos los archivos relacionados a un paciente dado su id, la estructura de los header es de la siguiente manera:
@@ -811,7 +807,6 @@ La respuesta puede ser
 #Respuesta no valida por un error inesperado
 {'Error en DeleteUser': TypeError}
 ```
-
 ##### (POST) GetInactivePatients
 
 En este llamado el cliente le pide a la API le retorne los pacientes que están inactivos, la estructura de los header es de la siguiente manera:
@@ -842,7 +837,7 @@ return Response.json()
 
 La respuesta puede ser
 
-- Respuesta valida del servidor [#Link](https://doctorhelperaibackend-qa.azurewebsites.net/Archivo?Url=JSON-GetInactivePatients.txt)
+- Respuesta valida del servidor <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/JSON-GetInactivePatients.txt)
 
 - Respuesta invalida del servidor
     ```python
@@ -915,7 +910,6 @@ La respuesta puede ser.
 #Respuesta no valida por un error inesperado
 {'Error en UpdatePatients': TypeError}
 ```
-
 ##### (POST) UpdateAppointment.
 
 En este llamado el cliente le pide a la API que actualice un appointment, los headers para el llamado son los siguientes:
@@ -971,7 +965,6 @@ La respuesta puede ser.
 #Respuesta no valida por un error inesperado
 {'Error en PostAppointment': TypeError}
 ```
-
 ##### (POST) DeleteAppointment
 
 En este llamado el cliente le pide a la API que elimine el appointmet de FHIR que correspondan al id de recurso enviado en el header "AppointmentId", la estructura de los header es de la siguiente manera:
@@ -1009,7 +1002,6 @@ La respuesta puede ser.
 #Respuesta no valida por un recurso no encontrado
 {"Status":"False","Error":f"Id no encontrado: {id}"}
 ```
-
 ##### (POST) InactivatePatient
 
 En este llamado el cliente le pide a la API que inactive al paciente de FHIR que correspondan al id de recurso enviado en el header 'PatientId', la estructura de los header es de la siguiente manera:
@@ -1046,7 +1038,6 @@ La respuesta puede ser.
 #Respuesta no valida por un recurso no encontrado
 {"Status":"False","Error":f"Id no encontrado: {id}"}
 ```
-
 ##### (POST) ActivatePatient
 
 En este llamado el cliente le pide a la API que active al paciente de FHIR que correspondan al id de recurso enviado en el header 'PatientId', la estructura de los header es de la siguiente manera:
@@ -1084,7 +1075,6 @@ La respuesta puede ser.
 #Respuesta no valida por un recurso no encontrado
 {"Status":"False","Error":f"Id no encontrado: {id}"}
 ```
-
 ##### (POST) GetPractitionerPhoto.
 
 En este llamado el cliente le pide a la API que le retorne la foto de un medico, esta se retona en BINARIO dentro de un json, los headers para el llamado son los siguientes:
@@ -1112,7 +1102,7 @@ Response = requests.post(Url, headers=Headers)
 PhotoData = Response.json()
 FilenName = PhotoData['FileName']
 PhotoData64 = PhotoData['File']
-Decodifica el binario desde base64
+# Decodifica el binario desde base64
 PhotoData64 = base64.b64decode(PhotoData64)
 
 withopen(FilenName, 'wb') as PhotoFile:
@@ -1120,13 +1110,12 @@ withopen(FilenName, 'wb') as PhotoFile:
 ```
 La respuesta puede ser.
 
--   Respuesta valida del servidor [#Link](https://doctorhelperaibackend-qa.azurewebsites.net/Archivo?Url=JSON-AudioSummary.txt)
+-   Respuesta valida del servidor <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/JSON-AudioSummary.txt)
 
 -   Respuesta no valida del servidor
     ```py
     {'Error en GetPractitionerPhoto': TypeError}
     ```
-
 ##### (POST) UpdatePractitionerPhoto.
 
 En este llamado el cliente le envia a la API la foto del medico, los headers para el llamado son los siguientes:
@@ -1163,6 +1152,61 @@ La respuesta puede ser.
 
 #Respuesta no valida por error desconocido
 {'Error en UpdatePractitionerPhoto': TypeError}
+```
+##### (POST) WakeUpWord (Nuevo).
+
+En este llamado el cliente le envia a la API archivos de audio en formato m4a correspondientes al comando dicho por el medico. estos dentro del archivo **DHAIWakeUpWord**. los headers para el llamado son los siguientes:
+```python
+{	
+    'Action' : 'WakeUpWord', 
+    'View': Vista,
+    'Token':"2343423423523m4523k4h23",
+    'PractitionerId':"1234567890"
+}
+```
+El valor del header **View** corresponde a la vista desde la cual el medico esta enviando el comando, las vistas validas con su respectiva imagen son:
+
+
+| Main | NewPatient | ListPatients |
+|:----: | :----: | :----: |
+| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/Main.png" height="400" />| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/NewPatient.png" height="400" />| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/ListPatients.png" height="400" />|
+
+| NewAppointments | Appointment | ListAppointments |
+| :----: | :----: | :----: |
+| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/NewAppointments.png" height="400" />| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/Appointment.png" height="400" />| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/ListAppointments.png" height="400" />|
+
+| RedyToRecord | Recording | Pause |
+| :----: | :----: | :----: |
+| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/RedyToRecord.png" height="400" />| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/Recording.png" height="400" />| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/Pause.png" height="400" />|
+
+| Finish |
+| :------: |
+| <img src="https://doctorhelperaibackend.blob.core.windows.net/documentation/Finish.png" height="400" /> |
+
+
+Ejemplo
+```python
+import requests
+
+Url = "https://doctorhelperaibackend-qa.azurewebsites.net" 
+
+Files = {'DHAIWakeUpWord': (f'{PractitionerId}-WakeUpWord.m4a', open(f'ArchivosDePrueba/WUW/{Command}', 'rb'), 'audio/mp4')}
+Headers = 	{	
+            'Action' : 'WakeUpWord', 
+            'View': Vista,
+            'Token':"2343423423523m4523k4h23",
+            'PractitionerId':"1234567890"
+            }
+Response = requests.post(Url, files=Files, headers=Headers)
+return Response.json()
+```
+La respuesta puede ser.
+```python
+#Respuesta valida
+{"Time": "465.16"}
+
+#Respuesta no valida por error desconocido
+{'Error en Planning': TypeError}
 ```
 ## Errores extra
 En esta sección se verán los 3 tipos de errores extras que pueden salir al usar la API
